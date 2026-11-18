@@ -26,7 +26,7 @@ try {
         'SELECT id, code, nom FROM groupe ORDER BY code'
     )->fetchAll();
 } catch (PDOException $exception) {
-    error_log('Unable to load student groups: ' . $exception->getMessage());
+    error_log('Erreur lors du chargement des groupes : ' . $exception->getMessage());
     $groupes = [];
     $errors[] = 'Impossible de charger la liste des groupes.';
 }
@@ -43,10 +43,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ];
 
     if (
-        !isset($_POST['csrf_token']) ||
+        !isset($_POST['csrf_token'], $_SESSION['csrf_token']) ||
+        !is_string($_POST['csrf_token']) ||
+        !is_string($_SESSION['csrf_token']) ||
         !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
     ) {
-        $errors[] = 'Session invalide. Veuillez reessayer.';
+        $errors[] = 'La session a expiré. Veuillez réessayer.';
     } else {
         $etudiant = new Etudiant($pdo);
 
@@ -72,11 +74,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } catch (InvalidArgumentException $exception) {
             $errors[] = $exception->getMessage();
         } catch (PDOException $exception) {
-            error_log('Unable to create student: ' . $exception->getMessage());
-            $errors[] = 'Cet email ou ce matricule existe deja.';
-        } catch (Throwable $exception) {
-            error_log('Unable to create student: ' . $exception->getMessage());
-            $errors[] = 'Une erreur est survenue lors de l\'ajout.';
+            error_log('Erreur lors de l’ajout de l’étudiant : ' . $exception->getMessage());
+            $errors[] = 'Impossible d’ajouter l’étudiant pour le moment. Réessayez plus tard.';
         }
     }
 }
@@ -86,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Ajouter un etudiant</title>
+    <title>Ajouter un étudiant</title>
     <link rel="stylesheet" href="../assets/css/admin-etudiant.css">
 </head>
 <body>
@@ -95,9 +94,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <header class="student-card__header">
                 <div>
                     <p class="eyebrow">Administration</p>
-                    <h1>Ajouter un nouvel etudiant</h1>
+                    <h1>Ajouter un nouvel étudiant</h1>
                 </div>
-                <a class="button button--secondary" href="etudiants.php">Liste des etudiants</a>
+                <a class="button button--secondary" href="etudiants.php">Liste des étudiants</a>
             </header>
 
             <?php if (!empty($errors)): ?>
@@ -113,10 +112,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <p>
                         <?= htmlspecialchars($success['prenom'], ENT_QUOTES, 'UTF-8') ?>
                         <?= htmlspecialchars($success['nom'], ENT_QUOTES, 'UTF-8') ?>
-                        a ete ajoute avec succes.
+                        a été ajouté avec succès.
                     </p>
                     <p>
-                        Matricule genere :
+                        Matricule généré :
                         <strong><?= htmlspecialchars($success['matricule'], ENT_QUOTES, 'UTF-8') ?></strong>
                     </p>
                 </div>
@@ -132,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </label>
 
                     <label>
-                        <span>Prenom *</span>
+                        <span>Prénom *</span>
                         <input type="text" name="prenom" value="<?= htmlspecialchars($form['prenom'], ENT_QUOTES, 'UTF-8') ?>" required>
                     </label>
 
@@ -142,7 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </label>
 
                     <label>
-                        <span>Telephone *</span>
+                        <span>Téléphone *</span>
                         <input type="tel" name="telephone" value="<?= htmlspecialchars($form['telephone'], ENT_QUOTES, 'UTF-8') ?>" required>
                     </label>
 
@@ -154,9 +153,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <label>
                         <span>Statut</span>
                         <select name="statut">
-                            <?php foreach (['ACTIF', 'SUSPENDU', 'ABANDONNE', 'TERMINE'] as $status): ?>
+                            <?php foreach ([
+                                'ACTIF' => 'Actif',
+                                'SUSPENDU' => 'Suspendu',
+                                'ABANDONNE' => 'Abandonné',
+                                'TERMINE' => 'Terminé',
+                            ] as $status => $label): ?>
                                 <option value="<?= $status ?>" <?= $form['statut'] === $status ? 'selected' : '' ?>>
-                                    <?= ucfirst(strtolower($status)) ?>
+                                    <?= $label ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
@@ -176,7 +180,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <div class="form-actions">
-                    <button type="submit" class="button button--primary">Ajouter l'etudiant</button>
+                    <button type="submit" class="button button--primary">Ajouter l’étudiant</button>
                 </div>
             </form>
         </section>

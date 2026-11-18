@@ -11,7 +11,7 @@ $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, [
 
 if ($id === false || $id === null) {
     http_response_code(400);
-    exit('Identifiant etudiant invalide.');
+    exit('Identifiant étudiant invalide.');
 }
 
 $etudiantModel = new Etudiant($pdo);
@@ -23,16 +23,16 @@ try {
 
     if ($etudiant === null) {
         http_response_code(404);
-        exit('Etudiant introuvable.');
+        exit('Étudiant introuvable.');
     }
 
     $groupes = $pdo->query(
         'SELECT id, code, nom FROM groupe ORDER BY code'
     )->fetchAll();
 } catch (PDOException $exception) {
-    error_log('Unable to load student for editing: ' . $exception->getMessage());
+    error_log('Erreur lors du chargement de l’étudiant à modifier : ' . $exception->getMessage());
     http_response_code(500);
-    exit('Impossible de charger les informations de cet etudiant.');
+    exit('Impossible de charger les informations de cet étudiant.');
 }
 
 $form = [
@@ -61,10 +61,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ];
 
     if (
-        !isset($_POST['csrf_token']) ||
+        !isset($_POST['csrf_token'], $_SESSION['csrf_token']) ||
+        !is_string($_POST['csrf_token']) ||
+        !is_string($_SESSION['csrf_token']) ||
         !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
     ) {
-        $errors[] = 'Session invalide. Veuillez reessayer.';
+        $errors[] = 'La session a expiré. Veuillez réessayer.';
     } else {
         try {
             $etudiantModel->update($id, $form);
@@ -73,11 +75,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } catch (InvalidArgumentException $exception) {
             $errors[] = $exception->getMessage();
         } catch (PDOException $exception) {
-            error_log('Unable to update student: ' . $exception->getMessage());
-            $errors[] = 'Cet email existe deja ou le groupe selectionne est invalide.';
-        } catch (Throwable $exception) {
-            error_log('Unable to update student: ' . $exception->getMessage());
-            $errors[] = 'Une erreur est survenue lors de la modification.';
+            error_log('Erreur lors de la modification de l’étudiant : ' . $exception->getMessage());
+            $errors[] = 'Impossible d’enregistrer les modifications. Vérifiez l’adresse e-mail et le groupe choisi.';
         }
     }
 }
@@ -87,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Modifier un etudiant</title>
+    <title>Modifier un étudiant</title>
     <link rel="stylesheet" href="../assets/css/admin-etudiant.css">
 </head>
 <body>
@@ -96,9 +95,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <header class="student-card__header student-list-header">
                 <div>
                     <p class="eyebrow">Administration</p>
-                    <h1>Modifier les informations</h1>
+                    <h1>Modifier les informations de l’étudiant</h1>
                 </div>
-                <a class="button button--secondary" href="fiche-etudiant.php?id=<?= (int) $id ?>">Retour a la fiche</a>
+                <a class="button button--secondary" href="fiche-etudiant.php?id=<?= (int) $id ?>">Retour à la fiche</a>
             </header>
 
             <?php if (!empty($errors)): ?>
@@ -111,14 +110,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <?php if ($success): ?>
                 <div class="alert alert--success" role="status">
-                    Les informations de l'etudiant ont ete modifiees.
+                    Les informations de l’étudiant ont été modifiées.
                 </div>
             <?php endif; ?>
 
             <p class="student-matricule">
                 Matricule :
                 <strong><?= htmlspecialchars($etudiant->matricule ?? '—', ENT_QUOTES, 'UTF-8') ?></strong>
-                <span>Le matricule est genere par le systeme et ne peut pas etre modifie.</span>
+                <span>Le matricule est généré automatiquement et ne peut pas être modifié.</span>
             </p>
 
             <form class="student-form" method="post">
@@ -131,7 +130,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </label>
 
                     <label>
-                        <span>Prenom *</span>
+                        <span>Prénom *</span>
                         <input type="text" name="prenom" value="<?= htmlspecialchars($form['prenom'], ENT_QUOTES, 'UTF-8') ?>" required>
                     </label>
 
@@ -141,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </label>
 
                     <label>
-                        <span>Telephone *</span>
+                        <span>Téléphone *</span>
                         <input type="tel" name="telephone" value="<?= htmlspecialchars($form['telephone'], ENT_QUOTES, 'UTF-8') ?>" required>
                     </label>
 
@@ -153,9 +152,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <label>
                         <span>Statut</span>
                         <select name="statut">
-                            <?php foreach (['ACTIF', 'SUSPENDU', 'ABANDONNE', 'TERMINE'] as $status): ?>
+                            <?php foreach ([
+                                'ACTIF' => 'Actif',
+                                'SUSPENDU' => 'Suspendu',
+                                'ABANDONNE' => 'Abandonné',
+                                'TERMINE' => 'Terminé',
+                            ] as $status => $label): ?>
                                 <option value="<?= $status ?>" <?= $form['statut'] === $status ? 'selected' : '' ?>>
-                                    <?= ucfirst(strtolower($status)) ?>
+                                    <?= $label ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>

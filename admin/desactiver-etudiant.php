@@ -8,7 +8,7 @@ require_once __DIR__ . '/../classes/Etudiant.php';
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Allow: POST');
     http_response_code(405);
-    exit('Methode non autorisee.');
+    exit('Méthode non autorisée.');
 }
 
 $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT, [
@@ -17,48 +17,40 @@ $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT, [
 
 if ($id === false || $id === null) {
     http_response_code(400);
-    exit('Identifiant etudiant invalide.');
+    exit('Identifiant étudiant invalide.');
 }
 
-if (
-    !isset($_POST['csrf_token'], $_SESSION['csrf_token']) ||
-    !is_string($_POST['csrf_token']) ||
-    !is_string($_SESSION['csrf_token']) ||
-    !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
-) {
+if (!isset($_POST['csrf_token'], $_SESSION['csrf_token'])
+    || !is_string($_POST['csrf_token'])
+    || !is_string($_SESSION['csrf_token'])
+    || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
     $_SESSION['student_flash'] = [
         'type' => 'error',
-        'message' => 'Session invalide. Veuillez reessayer.',
+        'message' => 'La session a expiré. Réessayez.',
     ];
 } else {
     try {
-        $updated = (new Etudiant($pdo))->desactiver($id);
-
-        $_SESSION['student_flash'] = $updated
-            ? [
+        if ((new Etudiant($pdo))->desactiver($id)) {
+            $_SESSION['student_flash'] = [
                 'type' => 'success',
-                'message' => 'Etudiant desactive avec succes.',
-            ]
-            : [
-                'type' => 'error',
-                'message' => 'Etudiant introuvable.',
+                'message' => 'L’étudiant a été désactivé.',
             ];
+        } else {
+            $_SESSION['student_flash'] = [
+                'type' => 'error',
+                'message' => 'Étudiant introuvable.',
+            ];
+        }
     } catch (InvalidArgumentException $exception) {
         $_SESSION['student_flash'] = [
             'type' => 'error',
             'message' => $exception->getMessage(),
         ];
     } catch (PDOException $exception) {
-        error_log('Unable to deactivate student: ' . $exception->getMessage());
+        error_log('Erreur lors de la désactivation de l’étudiant : ' . $exception->getMessage());
         $_SESSION['student_flash'] = [
             'type' => 'error',
-            'message' => 'Impossible de desactiver cet etudiant.',
-        ];
-    } catch (Throwable $exception) {
-        error_log('Unable to deactivate student: ' . $exception->getMessage());
-        $_SESSION['student_flash'] = [
-            'type' => 'error',
-            'message' => 'Une erreur est survenue lors de la desactivation.',
+            'message' => 'La désactivation a échoué. Réessayez plus tard.',
         ];
     }
 }

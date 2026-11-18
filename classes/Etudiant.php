@@ -161,7 +161,7 @@ class Etudiant
             return false;
         }
 
-        $this->validate($data, true);
+        $this->validate($data);
         $this->pdo->beginTransaction();
 
         try {
@@ -243,7 +243,7 @@ class Etudiant
 
         if ($student->statut !== 'ACTIF') {
             throw new InvalidArgumentException(
-                'Seuls les etudiants actifs peuvent etre desactives.'
+                'Seuls les étudiants actifs peuvent être désactivés.'
             );
         }
 
@@ -261,13 +261,22 @@ class Etudiant
         return $student !== null && $student->statut === 'SUSPENDU';
     }
 
-    private function validate(array $data, bool $updating = false): void
+    private function validate(array $data): void
     {
         $required = ['nom', 'prenom', 'email', 'date_naissance', 'telephone'];
+        $labels = [
+            'nom' => 'nom',
+            'prenom' => 'prénom',
+            'email' => 'adresse e-mail',
+            'date_naissance' => 'date de naissance',
+            'telephone' => 'téléphone',
+        ];
 
         foreach ($required as $field) {
             if (!isset($data[$field]) || trim((string) $data[$field]) === '') {
-                throw new InvalidArgumentException("Le champ {$field} est obligatoire.");
+                throw new InvalidArgumentException(
+                    'Le champ ' . $labels[$field] . ' est obligatoire.'
+                );
             }
         }
 
@@ -283,7 +292,7 @@ class Etudiant
         }
 
         if (!$updating && isset($data['mot_de_passe']) && strlen($data['mot_de_passe']) < 8) {
-            throw new InvalidArgumentException('Le mot de passe doit contenir au moins 8 caracteres.');
+            throw new InvalidArgumentException('Le mot de passe doit contenir au moins 8 caractères.');
         }
     }
 

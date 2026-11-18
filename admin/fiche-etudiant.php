@@ -20,19 +20,19 @@ $error = null;
 
 if ($id === false || $id === null) {
     http_response_code(400);
-    $error = 'Identifiant etudiant invalide.';
+    $error = 'Identifiant étudiant invalide.';
 } else {
     try {
         $etudiant = (new Etudiant($pdo))->findById($id);
 
         if ($etudiant === null) {
             http_response_code(404);
-            $error = 'Etudiant introuvable.';
+            $error = 'Étudiant introuvable.';
         }
     } catch (PDOException $exception) {
-        error_log('Unable to load student profile: ' . $exception->getMessage());
+        error_log('Erreur lors du chargement de la fiche étudiant : ' . $exception->getMessage());
         http_response_code(500);
-        $error = 'Impossible de charger la fiche de cet etudiant.';
+        $error = 'Impossible de charger la fiche de cet étudiant.';
     }
 }
 ?>
@@ -41,7 +41,7 @@ if ($id === false || $id === null) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Fiche etudiant</title>
+    <title>Fiche étudiant</title>
     <link rel="stylesheet" href="../assets/css/admin-etudiant.css">
 </head>
 <body>
@@ -50,20 +50,20 @@ if ($id === false || $id === null) {
             <header class="student-card__header student-list-header">
                 <div>
                     <p class="eyebrow">Administration</p>
-                    <h1>Fiche de l'etudiant</h1>
+                    <h1>Fiche de l’étudiant</h1>
                 </div>
                 <div class="student-actions">
                     <?php if ($etudiant !== null): ?>
                         <a class="button button--primary" href="modifier-etudiant.php?id=<?= (int) $etudiant->id ?>">Modifier</a>
                         <?php if ($etudiant->statut === 'ACTIF'): ?>
-                            <form method="post" action="desactiver-etudiant.php" onsubmit="return confirm('Desactiver cet etudiant ?');">
+                            <form method="post" action="desactiver-etudiant.php" onsubmit="return confirm('Désactiver cet étudiant ?');">
                                 <input type="hidden" name="id" value="<?= (int) $etudiant->id ?>">
                                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
-                                <button class="button button--danger" type="submit">Desactiver</button>
+                                <button class="button button--danger" type="submit">Désactiver</button>
                             </form>
                         <?php endif; ?>
                     <?php endif; ?>
-                    <a class="button button--secondary" href="etudiants.php">Retour a la liste</a>
+                    <a class="button button--secondary" href="etudiants.php">Retour à la liste</a>
                 </div>
             </header>
 
@@ -103,7 +103,7 @@ if ($id === false || $id === null) {
                             </dd>
                         </div>
                         <div>
-                            <dt>Telephone</dt>
+                            <dt>Téléphone</dt>
                             <dd><?= htmlspecialchars($etudiant->telephone, ENT_QUOTES, 'UTF-8') ?></dd>
                         </div>
                         <div>
@@ -117,7 +117,7 @@ if ($id === false || $id === null) {
                                     <?= htmlspecialchars($etudiant->groupe_code ?? '', ENT_QUOTES, 'UTF-8') ?>
                                     - <?= htmlspecialchars($etudiant->groupe_nom ?? '', ENT_QUOTES, 'UTF-8') ?>
                                 <?php else: ?>
-                                    Aucun groupe affecte
+                                    Aucun groupe affecté
                                 <?php endif; ?>
                             </dd>
                         </div>

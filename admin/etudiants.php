@@ -9,8 +9,8 @@ $etudiants = [];
 try {
     $etudiants = (new Etudiant($pdo))->findAll();
 } catch (PDOException $exception) {
-    error_log('Unable to load students: ' . $exception->getMessage());
-    $error = 'Impossible de charger la liste des etudiants.';
+    error_log('Erreur lors du chargement des étudiants : ' . $exception->getMessage());
+    $error = 'Impossible de charger la liste des étudiants.';
 }
 ?>
 <!DOCTYPE html>
@@ -18,7 +18,7 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Liste des etudiants</title>
+    <title>Liste des étudiants</title>
     <link rel="stylesheet" href="../assets/css/admin-etudiant.css">
 </head>
 <body>
@@ -27,12 +27,12 @@ try {
             <header class="student-card__header student-list-header">
                 <div>
                     <p class="eyebrow">Administration</p>
-                    <h1>Liste des etudiants</h1>
+                    <h1>Liste des étudiants</h1>
                     <p class="student-list-count">
-                        <?= count($etudiants) ?> etudiant<?= count($etudiants) === 1 ? '' : 's' ?>
+                        <?= count($etudiants) ?> étudiant<?= count($etudiants) === 1 ? '' : 's' ?>
                     </p>
                 </div>
-                <a class="button button--primary" href="ajouter-etudiant.php">Ajouter un etudiant</a>
+                <a class="button button--primary" href="ajouter-etudiant.php">Ajouter un étudiant</a>
             </header>
 
             <?php if ($error !== null): ?>
@@ -41,7 +41,7 @@ try {
                 </div>
             <?php elseif (empty($etudiants)): ?>
                 <div class="student-list-empty">
-                    <p>Aucun etudiant n'est enregistre pour le moment.</p>
+                    <p>Aucun étudiant n’est enregistré pour le moment.</p>
                 </div>
             <?php else: ?>
                 <div class="student-table-wrap">
@@ -49,9 +49,9 @@ try {
                         <thead>
                             <tr>
                                 <th scope="col">Matricule</th>
-                                <th scope="col">Nom et prenom</th>
+                                <th scope="col">Nom et prénom</th>
                                 <th scope="col">Email</th>
-                                <th scope="col">Telephone</th>
+                                <th scope="col">Téléphone</th>
                                 <th scope="col">Date de naissance</th>
                                 <th scope="col">Groupe</th>
                                 <th scope="col">Statut</th>
