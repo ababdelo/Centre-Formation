@@ -12,6 +12,18 @@ class Module
         $sql = ("select id, code, intitule, description,volume_horaire from module order by code");
         return $this->pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
     }
+    public function codeExist($code, $exludedID = null)
+    {
+        $sql = "select count(*) from module where code = ?";
+        $params = [$code];
+        if ($exludedID !== null) {
+            $sql .= " AND id <> ?";
+            $params[] = $exludedID;
+        }
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        return (int) $stmt->fetchColumn() > 0;
+    }
     public function estAffecte($id_module)
     {
         $stmt = $this->pdo->prepare("select count(*) from affectation where id_module = ?");
@@ -24,8 +36,27 @@ class Module
         if ($this->estAffecte($id)) {
             throw new Exception("Ce module est déjà affecté, il ne peut plus être modifié.");
         }
+        if ($this->codeExist($code, $id)) {
+            throw new Exception("Ce module Existe deja.");
+        }
 
         $stmt = $this->pdo->prepare("update module set code= ? , intitule = ? ,description = ? , volume_horaire= ? where id = ?");
         $stmt->execute([$code, $intitule, $description, $VolHor, $id]);
+    }
+
+    public function ajouter($code, $intitule, $description, $volHor)
+    {
+        if ($this->codeExist($code)) {
+            throw new Exception("ce Code de module est deja exist.");
+        }
+        $stmt = $this->pdo->prepare("insert into module(code, intitule , description, volume_horaire) values(?,?,?,?)");
+        $stmt->execute([$code, $intitule, $description, $volHor]);
+        return (int) $this->pdo->lastInsertId();
+    }
+
+    public function trouver($id){
+        $stmt = $this->pdo->prepare("select id,code, intitule ,description , volume_horaire from module where id = ?");
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
     }
 }
