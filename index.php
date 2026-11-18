@@ -18,7 +18,7 @@
     </div>
 
     <div class="glass-box">
-      <form method="post" action="checkuser.php">
+      <form method="post" action="includes/checkuser.php">
          <?php require_once __DIR__ . '/config/connection.php';?>
         <?php if (isset($_GET['err'])): ?>
                 <p style="color: red;">
