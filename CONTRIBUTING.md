@@ -85,3 +85,6 @@ Check the following:
 ## Questions and coordination
 
 For unclear requirements or shared-file conflicts, discuss the change with the relevant teammate before implementing a separate solution. Prefer agreeing on one approach over having multiple people modify the same part independently.
+
+## Alert
+**RTFM** (Read The F***ing Manual) before asking questions. If you have a question, check the documentation and code first. If you still need help, ask in the team chat or in a pull request comment. And before starting working on a task, pull the fucking latest changes from the `dev` branch, then create your task branch. If you don't do this, you will have to deal with merge conflicts and wasted time on your own. And do not fucking commit to `dev` or `main` directly, you will be yelled at. And do fucking provide a proper commit message, not a meaningless ones.
