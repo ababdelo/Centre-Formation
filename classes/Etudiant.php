@@ -9,6 +9,61 @@ class Etudiant
         $this->pdo = $pdo;
     }
 
+    public function listerParGroupe(int $idGroupe): array
+    {
+        $sql = "
+            SELECT e.id, e.matricule, e.telephone, e.statut,
+                   u.nom, u.prenom, u.email
+            FROM etudiant e
+            INNER JOIN utilisateur u ON u.id = e.id_utilisateur
+            WHERE e.id_groupe = :id_groupe
+            ORDER BY u.nom, u.prenom
+        ";
+
+        $statement = $this->pdo->prepare($sql);
+        $statement->execute(['id_groupe' => $idGroupe]);
+
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function listerSansGroupe(): array
+    {
+        $sql = "
+            SELECT e.id, e.matricule, u.nom, u.prenom
+            FROM etudiant e
+            INNER JOIN utilisateur u ON u.id = e.id_utilisateur
+            WHERE e.id_groupe IS NULL
+            ORDER BY u.nom, u.prenom
+        ";
+
+        return $this->pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function ajouterAuGroupe(int $idEtudiant, int $idGroupe): bool
+    {
+        $statement = $this->pdo->prepare(
+            'UPDATE etudiant SET id_groupe = :id_groupe
+             WHERE id = :id AND id_groupe IS NULL'
+        );
+        $statement->execute([
+            'id_groupe' => $idGroupe,
+            'id' => $idEtudiant,
+        ]);
+
+        return $statement->rowCount() === 1;
+    }
+
+    public function retirerDuGroupe(int $idEtudiant): bool
+    {
+        $statement = $this->pdo->prepare(
+            'UPDATE etudiant SET id_groupe = NULL
+             WHERE id = :id AND id_groupe IS NOT NULL'
+        );
+        $statement->execute(['id' => $idEtudiant]);
+
+        return $statement->rowCount() === 1;
+    }
+
     public function findAll(): array
     {
         $sql = "
@@ -161,7 +216,7 @@ class Etudiant
             return false;
         }
 
-        $this->validate($data);
+        $this->validate($data, true);
         $this->pdo->beginTransaction();
 
         try {
@@ -261,7 +316,7 @@ class Etudiant
         return $student !== null && $student->statut === 'SUSPENDU';
     }
 
-    private function validate(array $data): void
+    private function validate(array $data, bool $updating = false): void
     {
         $required = ['nom', 'prenom', 'email', 'date_naissance', 'telephone'];
         $labels = [

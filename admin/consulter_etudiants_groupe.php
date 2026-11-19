@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../config/connection.php';
 require_once __DIR__ . '/../classes/groupe.php';
-require_once __DIR__ . '/../classes/etudiant.php';
+require_once __DIR__ . '/../classes/Etudiant.php';
 
 $groupe = new Groupe($pdo);
 $idGroupe = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, [
