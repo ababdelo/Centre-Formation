@@ -30,7 +30,6 @@ class Affectation
         return (int) $this->pdo->lastInsertId();
     }
 
-    // The same SELECT is used by the admin list and by the trainer view
     private function selectBase()
     {
         return "SELECT a.id, a.id_groupe, a.id_module, a.id_formateur, a.annee,
@@ -44,7 +43,6 @@ class Affectation
                 JOIN utilisateur u ON u.id = f.id_utilisateur";
     }
 
-    // Admin view: every affectation. Both filters are optional (null = no filter).
     public function lister_Affectations($id_groupe = null, $id_formateur = null)
     {
         $conditions = [];
@@ -70,13 +68,6 @@ class Affectation
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Trainer view: only the affectations of the logged-in user.
-    // $id_utilisateur must come from the session, never from the URL or a form.
-    public function parUtilisateur($id_utilisateur)
-    {
-        $sql = $this->selectBase() . " WHERE f.id_utilisateur = ? ORDER BY a.annee DESC, g.nom, m.code";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([$id_utilisateur]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+   
+    
 }
