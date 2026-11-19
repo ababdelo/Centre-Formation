@@ -2,14 +2,14 @@
 
 class Etudiant
 {
-    private $pdo;
+    private PDO $pdo;
 
-    public function __construct($pdo)
+    public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
     }
 
-    public function listerParGroupe($idGroupe)
+    public function listerParGroupe(int $idGroupe): array
     {
         $sql = "SELECT e.id, e.matricule, e.telephone, e.statut,
                        u.nom, u.prenom, u.email
@@ -24,7 +24,7 @@ class Etudiant
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function listerSansGroupe()
+    public function listerSansGroupe(): array
     {
         $sql = "SELECT e.id, e.matricule, u.nom, u.prenom
                 FROM etudiant e
@@ -35,15 +35,23 @@ class Etudiant
         return $this->pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function ajouterAuGroupe($idEtudiant, $idGroupe)
+    public function ajouterAuGroupe(int $idEtudiant, int $idGroupe): bool
     {
-        $stmt = $this->pdo->prepare("UPDATE etudiant SET id_groupe = ? WHERE id = ?");
+        $stmt = $this->pdo->prepare(
+            "UPDATE etudiant SET id_groupe = ? WHERE id = ? AND id_groupe IS NULL"
+        );
         $stmt->execute([$idGroupe, $idEtudiant]);
+
+        return $stmt->rowCount() === 1;
     }
 
-    public function retirerDuGroupe($idEtudiant)
+    public function retirerDuGroupe(int $idEtudiant): bool
     {
-        $stmt = $this->pdo->prepare("UPDATE etudiant SET id_groupe = NULL WHERE id = ?");
+        $stmt = $this->pdo->prepare(
+            "UPDATE etudiant SET id_groupe = NULL WHERE id = ? AND id_groupe IS NOT NULL"
+        );
         $stmt->execute([$idEtudiant]);
+
+        return $stmt->rowCount() === 1;
     }
 }

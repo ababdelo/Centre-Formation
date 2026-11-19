@@ -12,14 +12,18 @@ $etudiant = new Etudiant($pdo);
 $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['ajouter']) && $_POST['id_etudiant'] !== '') {
-        $etudiant->ajouterAuGroupe($_POST['id_etudiant'], $idGroupe);
-        $message = 'Étudiant ajouté au groupe.';
+    if (isset($_POST['ajouter']) && isset($_POST['id_etudiant']) && $_POST['id_etudiant'] !== '') {
+        $ajoute = $etudiant->ajouterAuGroupe((int) $_POST['id_etudiant'], (int) $idGroupe);
+        $message = $ajoute
+            ? 'Étudiant ajouté au groupe.'
+            : 'Impossible d’ajouter cet étudiant : il est introuvable ou déjà affecté à un groupe.';
     }
 
-    if (isset($_POST['retirer'])) {
-        $etudiant->retirerDuGroupe($_POST['id_etudiant']);
-        $message = 'Étudiant retiré du groupe.';
+    if (isset($_POST['retirer']) && isset($_POST['id_etudiant'])) {
+        $retire = $etudiant->retirerDuGroupe((int) $_POST['id_etudiant']);
+        $message = $retire
+            ? 'Étudiant retiré du groupe.'
+            : 'Impossible de retirer cet étudiant : il est introuvable ou sans groupe.';
     }
 }
 
