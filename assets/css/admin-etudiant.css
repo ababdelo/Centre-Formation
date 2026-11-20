@@ -183,6 +183,10 @@ body {
     font-weight: 700;
 }
 
+a {
+    text-decoration: none;
+}
+
 .button--primary {
     color: #fff;
     background: var(--color-primary);
