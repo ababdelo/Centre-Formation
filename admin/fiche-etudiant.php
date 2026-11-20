@@ -3,7 +3,7 @@
 session_start();
 
 require_once __DIR__ . '/../config/connection.php';
-require_once __DIR__ . '/../classes/Etudiant.php';
+require_once __DIR__ . '/../classes/etudiant.php';
 
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
