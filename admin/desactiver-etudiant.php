@@ -3,7 +3,7 @@
 session_start();
 
 require_once __DIR__ . '/../config/connection.php';
-require_once __DIR__ . '/../classes/Etudiant.php';
+require_once __DIR__ . '/../classes/etudiant.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Allow: POST');

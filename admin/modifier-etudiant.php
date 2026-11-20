@@ -3,7 +3,7 @@
 session_start();
 
 require_once __DIR__ . '/../config/connection.php';
-require_once __DIR__ . '/../classes/Etudiant.php';
+require_once __DIR__ . '/../classes/etudiant.php';
 
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, [
     'options' => ['min_range' => 1],
