@@ -10,47 +10,68 @@ $groupes = $groupe->lister();
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Liste des groupes</title>
-    <style>
-        body { font-family: Arial; background:white; }
-        .liste { width: 900px; margin: 40px auto; background: white; padding: 20px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid white; padding: 8px; text-align: left; }
-        th { background:blue; color: white; }
-        a { color:blue; }
-    </style>
+    <link rel="stylesheet" href="../assets/css/admin-etudiant.css">
 </head>
 <body>
-    <div class="liste">
-        <h2>Liste des groupes</h2>
+    <main class="student-page">
+        <section class="student-card student-card--list">
+            <header class="student-card__header student-list-header">
+                <div>
+                    <p class="eyebrow">Administration</p>
+                    <h1>Liste des groupes</h1>
+                    <p class="student-list-count">
+                        <?= count($groupes) ?> groupe<?= count($groupes) === 1 ? '' : 's' ?>
+                    </p>
+                </div>
+                <a class="button button--primary" href="creer_groupe.php">Créer un groupe</a>
+            </header>
 
-        <table>
-            <tr>
-                <th>Code</th>
-                <th>Nom</th>
-                <th>Filière</th>
-                <th>Année</th>
-                <th>Capacité</th>
-                <th>Statut</th>
-                <th>Action</th>
-            </tr>
-
-            <?php foreach ($groupes as $groupe): ?>
-                <tr>
-                    <td><?= $groupe['code'] ?></td>
-                    <td><?= $groupe['nom'] ?></td>
-                    <td><?= $groupe['filiere'] ?></td>
-                    <td><?= $groupe['annee'] ?></td>
-                    <td><?= $groupe['capacity'] ?></td>
-                    <td><?= $groupe['statut'] ?></td>
-                    <td>
-                        <a href="modifier_groupe.php?id=<?= $groupe['id'] ?>">Modifier</a>
-                        |
-                        <a href="consulter_etudiants_groupe.php?id=<?= $groupe['id'] ?>">Étudiants</a>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        </table>
-    </div>
+            <?php if (empty($groupes)): ?>
+                <div class="student-list-empty">
+                    <p>Aucun groupe n’est enregistré pour le moment.</p>
+                </div>
+            <?php else: ?>
+                <div class="student-table-wrap">
+                    <table class="student-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Code</th>
+                                <th scope="col">Nom</th>
+                                <th scope="col">Filière</th>
+                                <th scope="col">Année</th>
+                                <th scope="col">Capacité</th>
+                                <th scope="col">Statut</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($groupes as $groupe): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($groupe['code'], ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td><?= htmlspecialchars($groupe['nom'], ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td><?= htmlspecialchars($groupe['filiere'], ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td><?= htmlspecialchars($groupe['annee'], ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td><?= htmlspecialchars($groupe['capacity'], ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td>
+                                        <span class="student-status student-status--<?= strtolower(htmlspecialchars($groupe['statut'], ENT_QUOTES, 'UTF-8')) ?>">
+                                            <?= htmlspecialchars($groupe['statut'], ENT_QUOTES, 'UTF-8') ?>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="student-actions">
+                                            <a class="button button--secondary" href="modifier_groupe.php?id=<?= (int) $groupe['id'] ?>">Modifier</a>
+                                            <a class="button button--primary" href="consulter_etudiants_groupe.php?id=<?= (int) $groupe['id'] ?>">Étudiants</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
+        </section>
+    </main>
 </body>
 </html>

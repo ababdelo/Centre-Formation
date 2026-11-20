@@ -183,6 +183,10 @@ body {
     font-weight: 700;
 }
 
+a {
+    text-decoration: none;
+}
+
 .button--primary {
     color: #fff;
     background: var(--color-primary);
@@ -243,6 +247,17 @@ body {
     color: var(--color-primary);
 }
 
+.student-table td a.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.student-table td a.button--primary {
+    color: #fff !important;
+}
+
 .student-status {
     display: inline-block;
     padding: 5px 9px;
@@ -262,6 +277,26 @@ body {
 .student-status--termine {
     color: #475569;
     background: #edf1f6;
+}
+
+.student-status--planifie {
+    color: #2155a4;
+    background: #eaf1fb;
+}
+
+.student-status--en_cours {
+    color: #9a6700;
+    background: #fff4d6;
+}
+
+.student-status--termine {
+    color: #17633a;
+    background: #eaf7ef;
+}
+
+.student-status--annule {
+    color: #8a1c1c;
+    background: #fdeaea;
 }
 
 .student-list-empty {
