@@ -23,43 +23,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Créer un groupe</title>
-    <style>
-        body { font-family: Arial; background: white; }
-        form { width: 400px; margin: 40px; background: white; padding: 20px; }
-        input, select { width: 100%; padding: 8px; margin: 5px 0 15px; }
-        button { padding: 10px; background:blue; color: white; border: none; }
-    </style>
+    <link rel="stylesheet" href="../assets/css/admin-etudiant.css">
 </head>
 <body>
-    <form method="post">
-        <h2>Créer un groupe</h2>
-        <p><?= $message ?></p>
+    <main class="student-page">
+        <section class="student-card">
+            <header class="student-card__header student-list-header">
+                <div>
+                    <p class="eyebrow">Administration</p>
+                    <h1>Créer un groupe</h1>
+                </div>
+                <a class="button button--secondary" href="affichage_liste_des_groupes.php">Liste des groupes</a>
+            </header>
 
-        <label>Code</label>
-        <input type="text" name="code" required>
+            <?php if ($message !== ''): ?>
+                <div class="alert alert--success" role="status"><?= htmlspecialchars($message, ENT_QUOTES, 'UTF-8') ?></div>
+            <?php endif; ?>
 
-        <label>Nom</label>
-        <input type="text" name="nom" required>
-
-        <label>Filière</label>
-        <input type="text" name="filiere" required>
-
-        <label>Année</label>
-        <input type="number" name="annee" required>
-
-        <label>Capacité</label>
-        <input type="number" name="capacity" required>
-
-        <label>Statut</label>
-        <select name="statut">
-            <option value="PLANIFIE">PLANIFIE</option>
-            <option value="EN_COURS">EN_COURS</option>
-            <option value="TERMINE">TERMINE</option>
-            <option value="ANNULE">ANNULE</option>
-        </select>
-
-        <button type="submit">Créer</button>
-    </form>
+            <form class="student-form" method="post">
+                <div class="form-grid">
+                    <label><span>Code *</span><input type="text" name="code" required></label>
+                    <label><span>Nom *</span><input type="text" name="nom" required></label>
+                    <label><span>Filière *</span><input type="text" name="filiere" required></label>
+                    <label><span>Année *</span><input type="number" name="annee" required></label>
+                    <label><span>Capacité *</span><input type="number" name="capacity" required></label>
+                    <label>
+                        <span>Statut</span>
+                        <select name="statut">
+                            <option value="PLANIFIE">PLANIFIE</option>
+                            <option value="EN_COURS">EN_COURS</option>
+                            <option value="TERMINE">TERMINE</option>
+                            <option value="ANNULE">ANNULE</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="button button--primary">Créer le groupe</button>
+                </div>
+            </form>
+        </section>
+    </main>
 </body>
 </html>

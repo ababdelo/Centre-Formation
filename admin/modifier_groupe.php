@@ -27,46 +27,51 @@ $data = $groupe->trouver($id);
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Modifier un groupe</title>
-    <style>
-        body { font-family: Arial; background: white; }
-        form { width: 400px; margin: 40px auto; background: white; padding: 20px; }
-        input, select { width: 100%; padding: 8px; margin: 5px 0 15px; }
-        button { padding: 10px; background:blue; color: white; border: none; }
-    </style>
+    <link rel="stylesheet" href="../assets/css/admin-etudiant.css">
 </head>
 <body>
-    <form method="post">
-        <h2>Modifier un groupe</h2>
-        <p><?= $message ?></p>
+    <main class="student-page">
+        <section class="student-card">
+            <header class="student-card__header student-list-header">
+                <div>
+                    <p class="eyebrow">Administration</p>
+                    <h1>Modifier un groupe</h1>
+                </div>
+                <a class="button button--secondary" href="affichage_liste_des_groupes.php">Liste des groupes</a>
+            </header>
 
-        <input type="hidden" name="id" value="<?= $data['id'] ?>">
+            <?php if ($message !== ''): ?>
+                <div class="alert alert--success" role="status"><?= htmlspecialchars($message, ENT_QUOTES, 'UTF-8') ?></div>
+            <?php endif; ?>
 
-        <label>Code</label>
-        <input type="text" name="code" value="<?= $data['code'] ?>" required>
-
-        <label>Nom</label>
-        <input type="text" name="nom" value="<?= $data['nom'] ?>" required>
-
-        <label>Filière</label>
-        <input type="text" name="filiere" value="<?= $data['filiere'] ?>" required>
-
-        <label>Année</label>
-        <input type="number" name="annee" value="<?= $data['annee'] ?>" required>
-
-        <label>Capacité</label>
-        <input type="number" name="capacity" value="<?= $data['capacity'] ?>" required>
-
-        <label>Statut</label>
-        <select name="statut">
-            <?php foreach (['PLANIFIE', 'EN_COURS', 'TERMINE', 'ANNULE'] as $statut): ?>
-                <option value="<?= $statut ?>" <?= $data['statut'] === $statut ? 'selected' : '' ?>>
-                    <?= $statut ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
-
-        <button type="submit">Modifier</button>
-    </form>
+            <?php if ($data !== false): ?>
+                <form class="student-form" method="post">
+                    <input type="hidden" name="id" value="<?= (int) $data['id'] ?>">
+                    <div class="form-grid">
+                        <label><span>Code *</span><input type="text" name="code" value="<?= htmlspecialchars($data['code'], ENT_QUOTES, 'UTF-8') ?>" required></label>
+                        <label><span>Nom *</span><input type="text" name="nom" value="<?= htmlspecialchars($data['nom'], ENT_QUOTES, 'UTF-8') ?>" required></label>
+                        <label><span>Filière *</span><input type="text" name="filiere" value="<?= htmlspecialchars($data['filiere'], ENT_QUOTES, 'UTF-8') ?>" required></label>
+                        <label><span>Année *</span><input type="number" name="annee" value="<?= htmlspecialchars($data['annee'], ENT_QUOTES, 'UTF-8') ?>" required></label>
+                        <label><span>Capacité *</span><input type="number" name="capacity" value="<?= htmlspecialchars($data['capacity'], ENT_QUOTES, 'UTF-8') ?>" required></label>
+                        <label>
+                            <span>Statut</span>
+                            <select name="statut">
+                                <?php foreach (['PLANIFIE', 'EN_COURS', 'TERMINE', 'ANNULE'] as $statut): ?>
+                                    <option value="<?= $statut ?>" <?= $data['statut'] === $statut ? 'selected' : '' ?>><?= $statut ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="button button--primary">Enregistrer les modifications</button>
+                    </div>
+                </form>
+            <?php else: ?>
+                <div class="alert alert--error">Groupe introuvable.</div>
+            <?php endif; ?>
+        </section>
+    </main>
 </body>
 </html>

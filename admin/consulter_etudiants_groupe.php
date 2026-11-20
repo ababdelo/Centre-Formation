@@ -3,7 +3,14 @@ require_once __DIR__ . '/../config/connection.php';
 require_once __DIR__ . '/../classes/groupe.php';
 require_once __DIR__ . '/../classes/etudiant.php';
 
-$idGroupe = $_GET['id'];
+$idGroupe = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, [
+    'options' => ['min_range' => 1],
+]);
+
+if ($idGroupe === false || $idGroupe === null) {
+    http_response_code(400);
+    exit('Identifiant groupe invalide.');
+}
 
 $groupe = new Groupe($pdo);
 $dataGroupe = $groupe->trouver($idGroupe);
@@ -31,60 +38,88 @@ $etudiantsSansGroupe = $etudiant->listerSansGroupe();
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Étudiants du groupe</title>
-    <style>
-        body { font-family: Arial; background: #f2f2f2; }
-        .liste { width: 900px; margin: 40px auto; background: white; padding: 20px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-        th { background: #0066cc; color: white; }
-    </style>
+    <link rel="stylesheet" href="../assets/css/admin-etudiant.css">
 </head>
 <body>
-    <div class="liste">
-        <h2>Étudiants du groupe <?= $dataGroupe['nom'] ?></h2>
-        <p><?= $message ?></p>
+    <main class="student-page">
+        <section class="student-card student-card--list">
+            <header class="student-card__header student-list-header">
+                <div>
+                    <p class="eyebrow">Administration</p>
+                    <h1>Étudiants du groupe <?= htmlspecialchars($dataGroupe['nom'] ?? '', ENT_QUOTES, 'UTF-8') ?></h1>
+                    <p class="student-list-count"><?= count($etudiants) ?> étudiant<?= count($etudiants) === 1 ? '' : 's' ?></p>
+                </div>
+                <a class="button button--secondary" href="affichage_liste_des_groupes.php">Liste des groupes</a>
+            </header>
 
-        <form method="post">
-            <label>Ajouter un étudiant :</label>
-            <select name="id_etudiant">
-                <?php foreach ($etudiantsSansGroupe as $e): ?>
-                    <option value="<?= $e['id'] ?>">
-                        <?= $e['nom'] ?> <?= $e['prenom'] ?> (<?= $e['matricule'] ?>)
-                    </option>
-                <?php endforeach; ?>
-            </select>
-            <button type="submit" name="ajouter">Ajouter</button>
-        </form>
+            <?php if ($message !== ''): ?>
+                <div class="alert alert--success" role="status"><?= htmlspecialchars($message, ENT_QUOTES, 'UTF-8') ?></div>
+            <?php endif; ?>
 
-        <table>
-            <tr>
-                <th>Matricule</th>
-                <th>Nom</th>
-                <th>Prénom</th>
-                <th>Email</th>
-                <th>Téléphone</th>
-                <th>Statut</th>
-                <th>Action</th>
-            </tr>
+            <?php if (!empty($etudiantsSansGroupe)): ?>
+                <form class="student-form" method="post">
+                    <div class="form-grid">
+                        <label class="form-grid__full">
+                            <span>Ajouter un étudiant sans groupe</span>
+                            <select name="id_etudiant">
+                                <?php foreach ($etudiantsSansGroupe as $e): ?>
+                                    <option value="<?= (int) $e['id'] ?>">
+                                        <?= htmlspecialchars($e['nom'] . ' ' . $e['prenom'] . ' (' . $e['matricule'] . ')', ENT_QUOTES, 'UTF-8') ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" name="ajouter" class="button button--primary">Ajouter au groupe</button>
+                    </div>
+                </form>
+            <?php endif; ?>
 
-            <?php foreach ($etudiants as $etudiant): ?>
-                <tr>
-                    <td><?= $etudiant['matricule'] ?></td>
-                    <td><?= $etudiant['nom'] ?></td>
-                    <td><?= $etudiant['prenom'] ?></td>
-                    <td><?= $etudiant['email'] ?></td>
-                    <td><?= $etudiant['telephone'] ?></td>
-                    <td><?= $etudiant['statut'] ?></td>
-                    <td>
-                        <form method="post">
-                            <input type="hidden" name="id_etudiant" value="<?= $etudiant['id'] ?>">
-                            <button type="submit" name="retirer">Retirer</button>
-                        </form>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        </table>
-    </div>
+            <?php if (empty($etudiants)): ?>
+                <div class="student-list-empty">
+                    <p>Aucun étudiant n’est affecté à ce groupe.</p>
+                </div>
+            <?php else: ?>
+                <div class="student-table-wrap">
+                    <table class="student-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Matricule</th>
+                                <th scope="col">Nom et prénom</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Téléphone</th>
+                                <th scope="col">Statut</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($etudiants as $etudiant): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($etudiant['matricule'], ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td><?= htmlspecialchars($etudiant['nom'] . ' ' . $etudiant['prenom'], ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td><a href="mailto:<?= htmlspecialchars($etudiant['email'], ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($etudiant['email'], ENT_QUOTES, 'UTF-8') ?></a></td>
+                                    <td><?= htmlspecialchars($etudiant['telephone'], ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td>
+                                        <span class="student-status student-status--<?= strtolower(htmlspecialchars($etudiant['statut'], ENT_QUOTES, 'UTF-8')) ?>">
+                                            <?= htmlspecialchars($etudiant['statut'], ENT_QUOTES, 'UTF-8') ?>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <form method="post" class="student-actions">
+                                            <input type="hidden" name="id_etudiant" value="<?= (int) $etudiant['id'] ?>">
+                                            <button type="submit" name="retirer" class="button button--danger">Retirer</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
+        </section>
+    </main>
 </body>
 </html>
