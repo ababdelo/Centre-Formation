@@ -38,7 +38,7 @@
   <main class="main-container">
     <div class="glass-panel">
       
-      <!-- Toolbar: Rechercher + Créer -->
+      <!-- Rechercher + Créer -->
       <div class="toolbar">
         <div class="search-box">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2">
