@@ -26,7 +26,7 @@
 
     <div class="cards-grid">
 
-      <a href="formateurs.php" class="card-3d">
+      <a href="formateur_int.php" class="card-3d">
         <img src="../assets/images/download (11).jpg" alt="Gestion des formateurs" class="card-bg-img">
         <div class="card-overlay"></div>
         <div class="card-content">
@@ -36,7 +36,7 @@
       </a>
 
      
-      <a href="modules.php" class="card-3d">
+      <a href="module_int.php" class="card-3d">
         <img src="../assets/images/download (12).jpg" alt="Gestion des modules" class="card-bg-img">
         <div class="card-overlay"></div>
         <div class="card-content">
@@ -46,7 +46,7 @@
       </a>
 
       
-      <a href="affectations.php" class="card-3d">
+      <a href="affectation_int.php" class="card-3d">
         <img src="../assets/images/affectation.jpg" alt="Gestion des affectations" class="card-bg-img">
         <div class="card-overlay"></div>
         <div class="card-content">
