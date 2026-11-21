@@ -11,7 +11,7 @@ if(isset($_POST["email"]) && isset($_POST["password"])){
        $_SESSION["name"]=$ligne["nom"];
        header("location:../admin/dashboard.php");
    }else{
-     header("location:index.php?err=1");
+     header("location:../index.php?err=1");
    }
 }
  
